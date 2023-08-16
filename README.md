@@ -1,1 +1,7 @@
 # R.Programming-Financial_Lending_Project
+
+In this project, I leveraged Data cleaning, Exploratory analysis, model fitting, model evaluation, and interpretation to identify the predictors of whether a loan will be good or bad. Also, to understand the relationship between the predictors and the target audience. After this project, I recommended the following:
+1) An increase in loan approvals for people with high FICO scores. However, caution should be exercised, as the loan amount should be proportional to the risk of lending based on the FICO score.
+2) People with low FICO scores tend to apply for smaller loan amounts and should not be written off without due diligence, as they may still be a viable business opportunity. Asking leading questions to understand the circumstances surrounding the low fico score and the loan could prove vital as we can learn a bit more about the situation and if an alternative way is possible.
+3) To expand the business to attract potential customers, the bank may partner with educational institutions, medical facilities, and small businesses, and reach out to them through targeted advertising. It was revealed from the analysis that those were the top three (3) reasons people go for loan - education, medical treatemt and for their business. The more they hear and know about us, the likelihood of attracting people within our business model. It will boost revenue and increase our bottom line at the end of the day.
+ 

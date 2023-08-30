@@ -1,15 +1,18 @@
+###LOAD NECESSARY PACKAGES
 library(tidyverse)
 install.packages("stargazer")
 install.packages("descr")
 library(stargazer)
 library(descr)
+
+###LOAD DATA
 loan <-read.csv(file.choose())
 
-##SELECTING VARIABLE
+##SELECT AND REMOVE ROWS WITH MISSING LOAN STATUS
 table(loan$loan_status)
-
 loan <- filter(loan, loan_status!="")
 
+###CONVERT LOAN STATUS INTO BINARY STATUS
 loan$status <- ifelse(loan$loan_status == "Current" | 
                         loan$loan_status == "Fully Paid" |
                         loan$loan_status == "Does not meet the credit policy.  Status:Fully Paid",
@@ -17,22 +20,24 @@ loan$status <- ifelse(loan$loan_status == "Current" |
 
 table(loan$status)    
 
-######CLEAN int_raet TO READ AS VARIABLE
+###CLEAN int_rate AND revol_util TO READ AS VARIABLE
 loan$int_rate <- as.numeric(gsub("%","", loan$int_rate))
 loan$revol_util <- as.numeric(gsub("%","", loan$revol_util))
 
+###CREATE BOX PLOTS FOR CONTINUOUS VARIABLES BY STATUS
 ggplot(loan, aes(x=status,y=installment)) + geom_boxplot()
 ggplot(loan, aes(x=status,y=int_rate)) + geom_boxplot()
 ggplot(loan, aes(x=status,y=revol_util)) + geom_boxplot()
 ggplot(loan, aes(x=status,y=fico_range_high)) + geom_boxplot()
 
-######QUALITATIVE VARIABLE
+######QUALITATIVE VARIABLE - CREATE CROSS-TABULATION OF home_ownership AND STATUS
 crosstab(loan$home_ownership, loan$status, prop.r = TRUE, plot = FALSE)
 
-###SELECT PREDICTOR VARIABLES
+###SELECT PREDICTOR VARIABLES AND CALCULATE THE AVERAGE FICO BY PREPROCESSING THE DATASET
 loan$fico <- (loan$fico_range_high+loan$fico_range_low)/2
-
 loan <- as.data.frame(loan)
+
+###SUMMARIZE SELECTED VARIABLES FOR 'goog' LOANS USING STARGAZER
 stargazer(select(filter(loan, status == "good"),dti, fico, revol_util), median = TRUE, type = "text")
 
 
@@ -41,7 +46,7 @@ ggplot(aes(x = dti, color = status) ,data = loan) + geom_density()
 ggplot(aes(x = fico, color = status) ,data = loan) + geom_density()
 ggplot(aes(x = revol_util, color = status) ,data = loan) + geom_density()
 
-##NORMALISE QUANTITATIVE VARIABLES
+###NORMALISE QUANTITATIVE VARIABLES
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
@@ -55,7 +60,7 @@ library(tidyverse)
 library(stargazer)
 library(descr)
 
-######ESTIMATE LOGISTICAL REGRESSION
+###ESTIMATE LOGISTICAL REGRESSION MODELS FOR DIFFERENT PREDICTORS
 loan$status <- as.factor(loan$status)
 logit1 <- glm(status ~ fico, data = loan, family = "binomial")
 summary(logit1)
@@ -72,13 +77,13 @@ loan$status <- as.factor(loan$status)
 logit4 <- glm(status ~ loan_amnt, data = loan, family = "binomial")
 summary(logit4)
 
-#######INTERPRET COEFFIECIENTS IN LOGIT REGRESSION I
+###INTERPRET COEFFIECIENTS IN LOGIT REGRESSION MODELS
 exp(coef(logit1))
 exp(coef(logit2))
 exp(coef(logit3))
 exp(coef(logit4))
 
-######INTERPRET COEFFICIENT IN LOGIT REGRESSION II
+######PREDICT FOR SPECIFIC ALUABLES IN IN LOGIT REGRESSION II
 test <- data.frame(fico=c(600,750))
 test$pred <- predict(logit1,test, type="response")
 test
@@ -87,7 +92,7 @@ test <- data.frame(fico=c(750,800))
 test$pred <- predict(logit1,test, type="response")
 test
 
-######INTERPRET COEFFICIENT IN A MULTIPLE REGRESSION
+###INTERPRET COEFFICIENT IN A MULTIPLE REGRESSION
 logit2 <- glm(status ~ fico + revol_util, data = loan, family = "binomial")
 summary(logit2)
 
@@ -97,7 +102,7 @@ summary(logit3)
 logit4 <- glm(status ~ fico + loan_amnt, data = loan, family = "binomial")
 summary(logit4)
 
-#####WORKING WITH CATEGORICAL VALUES
+###ESTIMATE A LOGISTIC REGRESSION MODEL WITH CATEGORICAL VARIABLES
 logit4 <- glm(status ~ fico + loan_amnt + purpose, data = loan, family = "binomial")
 summary(logit4)
 
